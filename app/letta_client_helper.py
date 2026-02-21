@@ -24,6 +24,63 @@ def get_client() -> Letta:
     return Letta(base_url=LETTA_BASE_URL)
 
 
+def ensure_letta_setup(client: Letta):
+    """
+    Ensure the Letta server has the Gemini provider and sandbox config.
+    Idempotent — safe to call on every Streamlit startup.
+    """
+    import requests
+
+    base = LETTA_BASE_URL.rstrip("/")
+
+    # 1. Register Gemini provider if not present
+    gemini_key = os.environ.get("GEMINI_API_KEY", "")
+    if gemini_key:
+        try:
+            resp = requests.get(f"{base}/v1/providers/", timeout=10)
+            providers = resp.json() if resp.ok else []
+            has_gemini = any(
+                p.get("provider_type") == "google_ai" for p in providers
+            )
+            if not has_gemini:
+                requests.post(
+                    f"{base}/v1/providers/",
+                    json={
+                        "provider_type": "google_ai",
+                        "api_key": gemini_key,
+                        "name": "gemini",
+                    },
+                    timeout=10,
+                )
+        except Exception:
+            pass
+
+    # 2. Ensure sandbox config has pymongo[srv]
+    try:
+        resp = requests.get(f"{base}/v1/sandbox-config/", timeout=10)
+        configs = resp.json() if resp.ok else []
+        has_pymongo = False
+        for cfg in configs:
+            reqs = cfg.get("config", {}).get("pip_requirements", [])
+            for r in reqs:
+                if "pymongo" in r.get("name", ""):
+                    has_pymongo = True
+                    break
+        if not has_pymongo:
+            requests.post(
+                f"{base}/v1/sandbox-config/local",
+                json={
+                    "sandbox_dir": "/root/.letta/tool_execution_dir",
+                    "use_venv": True,
+                    "venv_name": "venv",
+                    "pip_requirements": [{"name": "pymongo[srv]"}],
+                },
+                timeout=10,
+            )
+    except Exception:
+        pass
+
+
 def load_system_prompt() -> str:
     """Load the system prompt from file."""
     with open(SYSTEM_PROMPT_PATH, "r") as f:

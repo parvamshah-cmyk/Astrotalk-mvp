@@ -18,6 +18,7 @@ from app.letta_client_helper import (
     send_message,
     extract_assistant_text,
     get_conversation_history,
+    ensure_letta_setup,
 )
 
 # --- Page Config ---
@@ -98,6 +99,7 @@ if not st.session_state.user_id:
 # --- Initialize Letta Client and Agent ---
 try:
     client = get_client()
+    ensure_letta_setup(client)
 except Exception as e:
     st.error(f"Cannot connect to Letta server: {e}")
     st.info("Make sure the Letta server is running: docker compose up -d")
