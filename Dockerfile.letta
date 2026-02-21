@@ -1,0 +1,4 @@
+FROM letta/letta:latest
+
+# Install pymongo in the main venv so the tool sandbox can access it
+RUN python -m ensurepip && python -m pip install --no-cache-dir pymongo>=4.6

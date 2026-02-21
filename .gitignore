@@ -1,0 +1,30 @@
+# Environment
+.env
+.venv/
+venv/
+
+# Credentials
+credentials/
+**/gcp-service-account.json
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker volumes (local)
+pgdata/
+mongo_data/

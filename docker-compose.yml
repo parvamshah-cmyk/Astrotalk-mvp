@@ -1,0 +1,58 @@
+services:
+  # Letta's internal PostgreSQL (agent state, memory, embeddings)
+  letta_db:
+    image: ankane/pgvector:v0.5.1
+    container_name: astrotalk-letta-db
+    environment:
+      POSTGRES_USER: ${LETTA_PG_USER:-letta}
+      POSTGRES_PASSWORD: ${LETTA_PG_PASSWORD:-letta}
+      POSTGRES_DB: ${LETTA_PG_DB:-letta}
+    ports:
+      - "5433:5432"
+    volumes:
+      - letta_pgdata:/var/lib/postgresql/data
+      - ./init-db:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${LETTA_PG_USER:-letta}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Letta Server (agent runtime)
+  letta_server:
+    image: letta/letta:latest
+    container_name: astrotalk-letta-server
+    depends_on:
+      letta_db:
+        condition: service_healthy
+    ports:
+      - "8283:8283"
+    env_file:
+      - .env
+    environment:
+      - LETTA_PG_URI=postgresql://${LETTA_PG_USER:-letta}:${LETTA_PG_PASSWORD:-letta}@letta_db:5432/${LETTA_PG_DB:-letta}
+    volumes:
+      - ./credentials/gcp-service-account.json:/app/gcp-service-account.json:ro
+    restart: unless-stopped
+
+  # MongoDB (user birth profiles)
+  mongodb:
+    image: mongo:7
+    container_name: astrotalk-mongodb
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER:-astrotalk}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD:-astrotalk123}
+      MONGO_INITDB_DATABASE: ${MONGO_DB:-astrotalk}
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  letta_pgdata:
+  mongo_data:

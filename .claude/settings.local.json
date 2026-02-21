@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "WebFetch(domain:docs.letta.com)",
+      "Bash(python3:*)",
+      "Bash(curl:*)",
+      "Bash(.venv/bin/python:*)"
+    ]
+  }
+}
