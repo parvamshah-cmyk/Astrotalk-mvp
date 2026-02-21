@@ -19,17 +19,21 @@ def fetch_user_birth_details(user_id: str) -> str:
     import os
     from pymongo import MongoClient
 
-    mongo_user = os.environ.get("MONGO_USER", "astrotalk")
-    mongo_password = os.environ.get("MONGO_PASSWORD", "astrotalk123")
-    mongo_host = os.environ.get("MONGO_HOST", "mongodb")
-    mongo_port = os.environ.get("MONGO_PORT", "27017")
-    mongo_db = os.environ.get("MONGO_DB", "astrotalk")
+    # Support both direct URI and individual components
+    mongo_uri = os.environ.get("MONGODB_URI")
+    if not mongo_uri:
+        mongo_user = os.environ.get("MONGO_USER", "astrotalk")
+        mongo_password = os.environ.get("MONGO_PASSWORD", "astrotalk123")
+        mongo_host = os.environ.get("MONGO_HOST", "mongodb")
+        mongo_port = os.environ.get("MONGO_PORT", "27017")
+        mongo_db = os.environ.get("MONGO_DB", "astrotalk")
+        mongo_uri = f"mongodb://{mongo_user}:{mongo_password}@{mongo_host}:{mongo_port}/{mongo_db}?authSource=admin"
 
-    uri = f"mongodb://{mongo_user}:{mongo_password}@{mongo_host}:{mongo_port}/{mongo_db}?authSource=admin"
+    mongo_db_name = os.environ.get("MONGO_DB", "astrotalk")
 
     try:
-        client = MongoClient(uri, serverSelectionTimeoutMS=5000)
-        db = client[mongo_db]
+        client = MongoClient(mongo_uri, serverSelectionTimeoutMS=5000)
+        db = client[mongo_db_name]
         collection = db["users"]
 
         user = collection.find_one(
@@ -88,17 +92,21 @@ def save_user_birth_details(
     from datetime import datetime, timezone
     from pymongo import MongoClient
 
-    mongo_user = os.environ.get("MONGO_USER", "astrotalk")
-    mongo_password = os.environ.get("MONGO_PASSWORD", "astrotalk123")
-    mongo_host = os.environ.get("MONGO_HOST", "mongodb")
-    mongo_port = os.environ.get("MONGO_PORT", "27017")
-    mongo_db = os.environ.get("MONGO_DB", "astrotalk")
+    # Support both direct URI and individual components
+    mongo_uri = os.environ.get("MONGODB_URI")
+    if not mongo_uri:
+        mongo_user = os.environ.get("MONGO_USER", "astrotalk")
+        mongo_password = os.environ.get("MONGO_PASSWORD", "astrotalk123")
+        mongo_host = os.environ.get("MONGO_HOST", "mongodb")
+        mongo_port = os.environ.get("MONGO_PORT", "27017")
+        mongo_db = os.environ.get("MONGO_DB", "astrotalk")
+        mongo_uri = f"mongodb://{mongo_user}:{mongo_password}@{mongo_host}:{mongo_port}/{mongo_db}?authSource=admin"
 
-    uri = f"mongodb://{mongo_user}:{mongo_password}@{mongo_host}:{mongo_port}/{mongo_db}?authSource=admin"
+    mongo_db_name = os.environ.get("MONGO_DB", "astrotalk")
 
     try:
-        client = MongoClient(uri, serverSelectionTimeoutMS=5000)
-        db = client[mongo_db]
+        client = MongoClient(mongo_uri, serverSelectionTimeoutMS=5000)
+        db = client[mongo_db_name]
         collection = db["users"]
 
         now = datetime.now(timezone.utc)

@@ -1,1 +1,1 @@
-pymongo>=4.6,<5.0
+pymongo[srv]>=4.6,<5.0
