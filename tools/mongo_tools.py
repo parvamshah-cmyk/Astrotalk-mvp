@@ -19,18 +19,12 @@ def fetch_user_birth_details(user_id: str) -> str:
     import os
     from pymongo import MongoClient
 
-    # Support both direct URI and individual components
-    mongo_uri = os.environ.get("MONGODB_URI")
-    if not mongo_uri:
-        mongo_user = os.environ.get("MONGO_USER", "astrotalk")
-        mongo_password = os.environ.get("MONGO_PASSWORD", "astrotalk123")
-        mongo_host = os.environ.get("MONGO_HOST", "mongodb")
-        mongo_port = os.environ.get("MONGO_PORT", "27017")
-        mongo_db = os.environ.get("MONGO_DB", "astrotalk")
-        mongo_uri = f"mongodb://{mongo_user}:{mongo_password}@{mongo_host}:{mongo_port}/{mongo_db}?authSource=admin"
-
+    # Default Atlas URI (fallback when env vars are unavailable in sandbox)
+    default_uri = "mongodb+srv://astrotalk:astrotalk123@cluster0.j1gz1tm.mongodb.net/astrotalk?retryWrites=true&w=majority&appName=Cluster0"
+    mongo_uri = os.environ.get("MONGODB_URI", default_uri)
     mongo_db_name = os.environ.get("MONGO_DB", "astrotalk")
 
+    client = None
     try:
         client = MongoClient(mongo_uri, serverSelectionTimeoutMS=5000)
         db = client[mongo_db_name]
@@ -59,7 +53,8 @@ def fetch_user_birth_details(user_id: str) -> str:
     except Exception as e:
         return json.dumps({"status": "error", "message": str(e)})
     finally:
-        client.close()
+        if client:
+            client.close()
 
 
 def save_user_birth_details(
@@ -92,18 +87,12 @@ def save_user_birth_details(
     from datetime import datetime, timezone
     from pymongo import MongoClient
 
-    # Support both direct URI and individual components
-    mongo_uri = os.environ.get("MONGODB_URI")
-    if not mongo_uri:
-        mongo_user = os.environ.get("MONGO_USER", "astrotalk")
-        mongo_password = os.environ.get("MONGO_PASSWORD", "astrotalk123")
-        mongo_host = os.environ.get("MONGO_HOST", "mongodb")
-        mongo_port = os.environ.get("MONGO_PORT", "27017")
-        mongo_db = os.environ.get("MONGO_DB", "astrotalk")
-        mongo_uri = f"mongodb://{mongo_user}:{mongo_password}@{mongo_host}:{mongo_port}/{mongo_db}?authSource=admin"
-
+    # Default Atlas URI (fallback when env vars are unavailable in sandbox)
+    default_uri = "mongodb+srv://astrotalk:astrotalk123@cluster0.j1gz1tm.mongodb.net/astrotalk?retryWrites=true&w=majority&appName=Cluster0"
+    mongo_uri = os.environ.get("MONGODB_URI", default_uri)
     mongo_db_name = os.environ.get("MONGO_DB", "astrotalk")
 
+    client = None
     try:
         client = MongoClient(mongo_uri, serverSelectionTimeoutMS=5000)
         db = client[mongo_db_name]
@@ -138,4 +127,5 @@ def save_user_birth_details(
     except Exception as e:
         return json.dumps({"status": "error", "message": str(e)})
     finally:
-        client.close()
+        if client:
+            client.close()
