@@ -5,7 +5,8 @@
       "WebFetch(domain:docs.letta.com)",
       "Bash(python3:*)",
       "Bash(curl:*)",
-      "Bash(.venv/bin/python:*)"
+      "Bash(.venv/bin/python:*)",
+      "Bash(LETTA_BASE_URL=https://letta-production-a2cf.up.railway.app /Users/parvamshah/Desktop/astrotalk-prompt/.venv/bin/python:*)"
     ]
   }
 }
