@@ -11,7 +11,7 @@ load_dotenv()
 LETTA_BASE_URL = os.getenv("LETTA_BASE_URL", "http://localhost:8283")
 
 # Models
-LLM_MODEL = os.getenv("LLM_MODEL", "gemini/gemini-2.5-flash")
+LLM_MODEL = os.getenv("LLM_MODEL", "anthropic/claude-sonnet-4-6")
 EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL", "letta/letta-free")
 
 # MongoDB (host-side access)

@@ -33,22 +33,22 @@ def ensure_letta_setup(client: Letta):
 
     base = LETTA_BASE_URL.rstrip("/")
 
-    # 1. Register Gemini provider if not present
-    gemini_key = os.environ.get("GEMINI_API_KEY", "")
-    if gemini_key:
+    # 1. Register Anthropic provider if not present
+    anthropic_key = os.environ.get("ANTHROPIC_API_KEY", "")
+    if anthropic_key:
         try:
             resp = requests.get(f"{base}/v1/providers/", timeout=10)
             providers = resp.json() if resp.ok else []
-            has_gemini = any(
-                p.get("provider_type") == "google_ai" for p in providers
+            has_anthropic = any(
+                p.get("provider_type") == "anthropic" for p in providers
             )
-            if not has_gemini:
+            if not has_anthropic:
                 requests.post(
                     f"{base}/v1/providers/",
                     json={
-                        "provider_type": "google_ai",
-                        "api_key": gemini_key,
-                        "name": "gemini",
+                        "provider_type": "anthropic",
+                        "api_key": anthropic_key,
+                        "name": "anthropic",
                     },
                     timeout=10,
                 )
